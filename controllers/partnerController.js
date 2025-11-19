@@ -1,6 +1,7 @@
 import PartnerProfile from '../models/PartnerProfile.js';
 import PortfolioItem from '../models/PortfolioItem.js';
 import Inquiry from "../models/Inquiry.js";
+import User from '../models/User.js';
 
 
 export const createOrUpdateProfile = async (req, res) => {
@@ -24,6 +25,7 @@ export const createOrUpdateProfile = async (req, res) => {
 export const addPortfolio = async (req, res) => {
   try {
     const { title, description, url, index } = req.body;
+    console.log('###########3',req.user._id);
     const partnerProfile = await PartnerProfile.findOne({ user: req.user._id });
     if (!partnerProfile) return res.status(400).json({ error: 'Partner profile not found' });
     const item = new PortfolioItem({
@@ -81,4 +83,37 @@ export const getAssignedLeads = async (req, res) => {
   }
 };
 
+
+
+export const partnerOnboarding = async (req, res) => {
+  try {
+    const partnerId = req.user.id;  // user id from auth middleware
+    const {
+      personalDetails,
+      serviceDetails,
+      documentMetadata,
+      portfolio,
+    } = req.body;
+
+    // Find the partner user
+    const partner = await User.findById(partnerId);
+    if (!partner || partner.role !== 'partner') {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    // Update partner fields
+    partner.personalDetails = personalDetails;
+    partner.serviceDetails = serviceDetails;
+    partner.documentMetadata = documentMetadata;
+    partner.portfolio = portfolio;
+    partner.verificationStatus = 'pending';
+
+    await partner.save();
+
+    res.status(200).json({ message: 'Onboarding submitted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
 

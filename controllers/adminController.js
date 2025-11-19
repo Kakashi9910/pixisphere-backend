@@ -15,7 +15,7 @@ export const verifyPartner = async (req, res) => {
   try {
     const { id } = req.params;
     const { action, comment } = req.body;
-    const profile = await PartnerProfile.findById(id).populate('user');
+    const profile = await User.findById(id).populate('user');
     if (!profile) return res.status(404).json({ error: 'Profile not found' });
     profile.verification.status = action === 'approve' ? 'verified' : 'rejected';
     profile.verification.adminComment = comment;

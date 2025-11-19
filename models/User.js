@@ -3,6 +3,11 @@ import bcrypt from 'bcryptjs';
 
 const { Schema } = mongoose;
 
+const portfolioEntrySchema = new Schema({
+  imageUrl: String,
+  description: String,
+});
+
 const userSchema = new Schema({
   role: { type: String, enum: ['client', 'partner', 'admin'], required: true },
   name: String,
@@ -11,6 +16,27 @@ const userSchema = new Schema({
   password: String,
   isPhoneVerified: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
+
+  // Partner onboarding fields
+  personalDetails: {
+    aadharNumber: String,        // Example sensitive info
+    address: String,             // Optional address field
+  },
+  serviceDetails: {
+    category: String,            // e.g., wedding, maternity, birthday
+    experienceYears: Number,
+    description: String,         // Short intro or service description
+  },
+  documentMetadata: {
+    aadharUrl: String,           // URL to uploaded Aadhar document or similar
+  },
+  portfolio: [portfolioEntrySchema],  // Array of portfolio images + descriptions
+
+  verificationStatus: {
+    type: String,
+    enum: ['pending', 'verified', 'rejected'],
+    default: 'pending',
+  },
 });
 
 userSchema.pre('save', async function (next) {

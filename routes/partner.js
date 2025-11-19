@@ -6,7 +6,8 @@ import {
   addPortfolio,
   reorderPortfolio,
   deletePortfolio,
-  getAssignedLeads
+  getAssignedLeads,
+  partnerOnboarding
 } from '../controllers/partnerController.js';
 
 const router = express.Router();
@@ -17,6 +18,12 @@ router.post('/portfolio', requireRole('partner'), addPortfolio);
 router.put('/portfolio/reorder', requireRole('partner'), reorderPortfolio);
 router.delete('/portfolio/:id', requireRole('partner'), deletePortfolio);
 router.get("/leads", auth, requireRole("partner"), getAssignedLeads);
+router.post(
+  '/onboarding',
+  auth,
+  requireRole("partner"),
+  partnerOnboarding
+);
 
 
 export default router;
